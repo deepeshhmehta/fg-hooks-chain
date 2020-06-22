@@ -10,7 +10,7 @@ The other day I was consuming fast-gateway and I came across use-cases to suppor
 ```
 import { multipleHooks } from 'fg-multiple-hooks';
 hooks: {
-    onRequest: async multipleHooks(req, res, hookFunction1, hookFunction2, ...),
+    onRequest: (req, res) => multipleHooks(req, res, hook1, hook2), // you can add as many hooks as you please
     onResponse: ...
 }
 ```
