@@ -1,6 +1,6 @@
 {
   "name": "fg-multiple-hooks",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "plugin for fast-gateway to support multiple hooks",
   "main": "index.js",
   "scripts": {
