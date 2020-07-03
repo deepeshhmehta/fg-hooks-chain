@@ -1,2 +1,7 @@
-type multipleHooks = (req: any, res: any, ...multipleHooks: Function) => boolean
-type oneHook = (req: any, res: any) => boolean
+declare namespace fgMultipleHooks {
+    type OneHook = (req: any, res: any) => boolean
+}
+
+declare function fgMultipleHooks(req: any, res: any, ...multipleHooks: Function[]): boolean
+
+export = fgMultipleHooks;

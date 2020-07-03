@@ -1,4 +1,4 @@
-const multipleHooks = async (req, res, ...multipleHooks) => {
+const fgMultipleHooks = async (req, res, ...multipleHooks) => {
     let shouldAbort = false;
     const promises = multipleHooks.map(async oneHook => {
         shouldAbort = shouldAbort || await oneHook(req, res);
@@ -7,4 +7,4 @@ const multipleHooks = async (req, res, ...multipleHooks) => {
     return shouldAbort;
 };
 
-module.exports = { multipleHooks };
+module.exports = fgMultipleHooks;
