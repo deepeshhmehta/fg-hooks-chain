@@ -1,5 +1,5 @@
 {
-  "name": "@local/fg-multiple-hooks",
+  "name": "fg-multiple-hooks",
   "version": "1.2.0",
   "description": "plugin for fast-gateway to support multiple hooks",
   "main": "index.js",
