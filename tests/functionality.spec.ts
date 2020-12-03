@@ -1,48 +1,50 @@
+const {fgMultipleHooks} = require('..');
+
+
+class Mocks {
+  static getFalse = () => false;
+  static getTrue = () => true;
+}
 
 describe('Testing Basic Functionality of Multiple Hooks', () => {
-    const fun1 = () => {
-        //does something
-        return false;
-    }
+  const req = {};
+  const res = {};
+  const stream = {};
 
-    const fun2 = () => {
-        //does something else
-        return true;
-    }
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(Mocks, 'getFalse');
+    jest.spyOn(Mocks, 'getTrue');
+  });
 
-    const req = {};
-    const res = {};
-    let multipleHooks;
-    let master = {
-        fun1,
-        fun2,
-    }
+  it('REQUEST - should call both functions and return true', async (done) => {
+    const result = await fgMultipleHooks.onRequestHooks(
+      req,
+      res,
+      Mocks.getFalse,
+      Mocks.getTrue
+    );
+    expect(result).toBeTruthy();
+    expect(Mocks.getFalse).toHaveBeenCalledTimes(1);
+    expect(Mocks.getTrue).toHaveBeenCalledTimes(1);
+    done();
+  });
 
-    beforeEach(() => {
-        master = {
-            fun1,
-            fun2
-        }
-        jest.spyOn(master, 'fun1')
-        jest.spyOn(master, 'fun2')
-        multipleHooks = require('../index');
-        
-    })
+//   it('REQUEST - should call only getFalse and return false', async (done) => {
+//     const result = await fgMultipleHooks.onRequestHooks(
+//       req,
+//       res,
+//       Mocks.getFalse,
+//       Mocks.getFalse
+//     );
+//     expect(result).toBeFalsy();
+//     expect(Mocks.getFalse).toHaveBeenCalledTimes(2);
+//     expect(Mocks.getTrue).toHaveBeenCalledTimes(0);
+//     done();
+//   });
 
-    it('should call both functions and return true', async (done) => {
-        const result = await multipleHooks(req, res, master.fun1, master.fun2)
-        expect(result).toBeTruthy();
-        expect(master.fun1).toHaveBeenCalledTimes(1);
-        expect(master.fun2).toHaveBeenCalledTimes(1);
-        done();
-    })
-
-    it('should call only fun1 and return false', async (done) => {
-        const result = await multipleHooks(req, res, master.fun1)
-        expect(result).toBeFalsy();
-        expect(master.fun1).toHaveBeenCalledTimes(1);
-        expect(master.fun2).toHaveBeenCalledTimes(0);
-        done();
-    })
-
-})
+//   it('RESPONSE - should call default response', async (done) => {
+//       jest.spyOn()
+//       const result = await fgMultipleHooks.onResponseHooks(req, res, stream, false)
+//   });
+});
