@@ -1,20 +1,20 @@
-type OneHook = (req: any, res: any) => boolean;
-type LastOnResponseHook = (req: any, res: any, stream: any) => void;
-type OnRequestHooks = (
+export function onRequestHook(req: any, res: any): boolean;
+export function onRequestHooks(
   req: any,
   res: any,
-  ...multipleHooks: OneHook[]
-) => boolean;
-type OnResponseHooks = (
+  ...multipleHooks: typeof onRequestHook[]
+): boolean;
+
+export function onResponseHook(req: any, res: any, stream: any): void;
+export function onResponseHooks(
   req: any,
   res: any,
   stream: any,
-  last: LastOnResponseHook,
-  ...multipleHooks: OneHook[]
-) => void;
-class FgMultipleHooks {
-  onRequestHooks: OnRequestHooks;
-  onResponseHooks: OnResponseHooks;
-}
-const fgMultipleHooks = new FgMultipleHooks();
-export = fgMultipleHooks;
+  useDefaultHook: boolean,
+  ...multipleHooks: typeof onResponseHook[]
+): void;
+
+export const fgMultipleHooks: {
+    onRequestHooks: typeof onRequestHooks;
+    onResponseHooks: typeof onResponseHooks;
+  };

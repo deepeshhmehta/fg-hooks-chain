@@ -5,15 +5,21 @@ const toArray = require('stream-to-array');
 const TRANSFER_ENCODING_HEADER_NAME = 'transfer-encoding'
 
 const onRequestHooks = async (req, res, ...multipleHooks) => {
+    // Used to terminate the hooks
     let shouldAbort = false;
-    const promises = multipleHooks.map(async oneHook => {
-        shouldAbort = shouldAbort || await oneHook(req, res);
+
+    // Iterate and check logical condition of each hook
+    const promises = multipleHooks.map(async onRequestHook => {
+        shouldAbort = shouldAbort || await onRequestHook(req, res);
     })
     await Promise.all(promises);
-    return shouldAbort;
+    
+    // If we return true, the the hook stops the flow at 'fast-gateway'
+    return !!shouldAbort;
 };
 
-const sendTheStreamUntouched = async (req, res, stream) => {
+const defaultOnResponseHook = async (req, res, stream) => {
+    // Default handling for stream copied from 'fast-gateway'
     const chunked = stream.headers[TRANSFER_ENCODING_HEADER_NAME]
         ? stream.headers[TRANSFER_ENCODING_HEADER_NAME].endsWith('chunked')
         : false
@@ -48,27 +54,36 @@ const sendTheStreamUntouched = async (req, res, stream) => {
     }
 }
 
-const onResponseHooks = async (req, res, stream, last, ...multipleHooks) => {
+const onResponseHooks = async (req, res, stream, useDefaultHook, ...multipleHooks) => {
+    // To be used to abort the request
     let shouldAbort = false;
-    const promises = multipleHooks.map(async oneHook => {
-        shouldAbort = shouldAbort || await oneHook(req, res);
+    
+    // run through logical block of each hook
+    const promises = multipleHooks.map(async onResponseHook => {
+        shouldAbort = shouldAbort || await onResponseHook(req, res, stream);
     })
+    
     await Promise.all(promises);
-    if (!shouldAbort) {
-        if (!!last) {
-            last(req, res, stream);
-        } else {
-            sendTheStreamUntouched(req, res, stream);
-        }
-    } else {
+    if (!!shouldAbort) {
         res.statusCode = 500;
         console.error('On Response Hook Failed')
         res.end('On Response Hook Failed');
+        return;
     }
+    
+    if (!!useDefaultHook) {
+        // Handle default connection close scenario
+        defaultOnResponseHook(req, res, stream);
+        return;
+    }
+
+    // else Simple Stream
+    res.statusCode = stream.statusCode
+    pump(stream, res)
 };
 
 const fgMultipleHooks = {};
 fgMultipleHooks.onRequestHooks = onRequestHooks;
 fgMultipleHooks.onResponseHooks = onResponseHooks;
 
-module.exports = fgMultipleHooks;
+module.exports = { fgMultipleHooks };
