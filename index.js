@@ -13,7 +13,7 @@ const onRequestHooks = async (req, res, ...multipleHooks) => {
     return shouldAbort;
 };
 
-const defaultLastOnResponse = async (req, res, stream) => {
+const sendTheStreamUntouched = async (req, res, stream) => {
     const chunked = stream.headers[TRANSFER_ENCODING_HEADER_NAME]
         ? stream.headers[TRANSFER_ENCODING_HEADER_NAME].endsWith('chunked')
         : false
@@ -58,7 +58,7 @@ const onResponseHooks = async (req, res, stream, last, ...multipleHooks) => {
         if (!!last) {
             last(req, res, stream);
         } else {
-            defaultLastOnResponse(req, res, stream);
+            sendTheStreamUntouched(req, res, stream);
         }
     } else {
         res.statusCode = 500;
