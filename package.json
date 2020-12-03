@@ -28,6 +28,7 @@
     "jest": "^26.1.0"
   },
   "dependencies": {
+    "husky": "^4.3.0",
     "pump": "^3.0.0",
     "stream-to-array": "^2.3.0"
   }
